@@ -172,11 +172,12 @@ namespace Helpers
 
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
                     {
-                        reader.Read();
-
-                        product.id = reader.GetInt32(reader.GetOrdinal("id"));
-                        product.createdAt = reader.GetString(reader.GetOrdinal("createdAt"));
-                        product.updatedAt = reader.GetString(reader.GetOrdinal("updatedAt"));
+                        if (reader.Read())
+                        {
+                            product.id = reader.GetInt32(reader.GetOrdinal("id"));
+                            product.createdAt = reader.GetString(reader.GetOrdinal("createdAt"));
+                            product.updatedAt = reader.GetString(reader.GetOrdinal("updatedAt"));
+                        }
                     }
                 }
 
@@ -187,7 +188,7 @@ namespace Helpers
 
         public static object ReadProduct(int id)
         {
-            object result;
+            object result = new {};
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
@@ -196,15 +197,17 @@ namespace Helpers
                 using (var cmd = new SQLiteCommand($"SELECT * FROM products WHERE id = {id}", connection))
                 using (SQLiteDataReader reader = cmd.ExecuteReader())
                 {
-                    reader.Read();
-
-                    result = new{
-                        id = id,
-                        name = reader.GetString(reader.GetOrdinal("name")),
-                        category = reader.GetInt32(reader.GetOrdinal("categoryId")),
-                        price = reader.GetFloat(reader.GetOrdinal("price")),
-                        stock = reader.GetInt32(reader.GetOrdinal("stock"))
-                    };
+                    if (reader.Read())
+                    {
+                        result = new{
+                            id = id,
+                            name = reader.GetString(reader.GetOrdinal("name")),
+                            category = reader.GetInt32(reader.GetOrdinal("categoryId")),
+                            price = reader.GetFloat(reader.GetOrdinal("price")),
+                            stock = reader.GetInt32(reader.GetOrdinal("stock"))
+                        };
+                    }
+                    else return Results.StatusCode(204);
                 }
             }
             return result;
@@ -237,6 +240,19 @@ namespace Helpers
             }
 
             return result;
+        }
+
+        public static IResult DeleteProduct(int productId)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var cmd = new SQLiteCommand($"DELETE FROM products WHERE id = {productId}", connection))
+                    cmd.ExecuteNonQuery();
+            }
+
+            return Results.StatusCode(204);
         }
 
         public static string ReadData(string query)
