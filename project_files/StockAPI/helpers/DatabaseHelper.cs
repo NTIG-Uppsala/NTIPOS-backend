@@ -210,6 +210,35 @@ namespace Helpers
             return result;
         }
 
+        public static List<object> ReadAllProducts()
+        {
+            List<object> result = new List<object>();
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var cmd = new SQLiteCommand($"SELECT * FROM products", connection))
+                using (SQLiteDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        object product = new{
+                            id = reader.GetInt32(reader.GetOrdinal("id")),
+                            name = reader.GetString(reader.GetOrdinal("name")),
+                            category = reader.GetInt32(reader.GetOrdinal("categoryId")),
+                            price = reader.GetFloat(reader.GetOrdinal("price")),
+                            stock = reader.GetInt32(reader.GetOrdinal("stock"))
+                        };
+
+                        result.Add(product);
+                    };
+                }
+            }
+
+            return result;
+        }
+
         public static string ReadData(string query)
         {
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
