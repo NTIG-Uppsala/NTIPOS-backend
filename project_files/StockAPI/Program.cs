@@ -1,4 +1,5 @@
 using Helpers;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
@@ -12,7 +13,12 @@ if (!File.Exists(DatabaseHelper.fileLocation))
     DatabaseHelper.AddProducts();
 }
 
-apiEndpoints.MapGet("/products/", DatabaseHelper.ReadAllProducts);
+apiEndpoints.MapPost("/products", (Product product) => 
+    {
+        DatabaseHelper.AddProduct(product);
+    });
+
+apiEndpoints.MapGet("/products", DatabaseHelper.ReadAllProducts);
 
 apiEndpoints.MapGet("/products/{id}", DatabaseHelper.ReadProduct);
 
