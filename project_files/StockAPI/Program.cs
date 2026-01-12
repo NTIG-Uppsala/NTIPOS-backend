@@ -1,4 +1,5 @@
 using Helpers;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
@@ -12,11 +13,31 @@ if (!File.Exists(DatabaseHelper.fileLocation))
     DatabaseHelper.AddProducts();
 }
 
+apiEndpoints.MapPost("/products/", DatabaseHelper.AddProduct);
+
+apiEndpoints.MapGet("/products/", DatabaseHelper.ReadAllProducts);
+
 apiEndpoints.MapGet("/products/{id}", DatabaseHelper.ReadProduct);
+
+apiEndpoints.MapPut("/products/{id}", DatabaseHelper.UpdateProduct);
+
+apiEndpoints.MapDelete("/products/{id}", DatabaseHelper.DeleteProduct);
+
+apiEndpoints.MapPost("/products/{id}/stock/add", (int id, StockInput body) =>
+{
+    return DatabaseHelper.EditStock(id, body.amount);
+});
+
+apiEndpoints.MapPost("/products/{id}/stock/remove", (int id, StockInput body) =>
+{
+    return DatabaseHelper.EditStock(id, body.amount * -1);
+});
+
 
 app.UsePathBase("/admin");
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.MapStaticAssets().ShortCircuit();
+
 
 app.Run();
