@@ -3,12 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Adminpanel</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    Hello World
+    <h1>Alla produkter</h1>
 
-    <script src="get_database.js"></script>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Kategori</th>
+                <th>Produktnamn</th>
+                <th>Pris</th>
+                <th>Lagersaldo</th>
+                <th>Redigera</th>
+                <th>Ta bort</th>
+            </tr>
+        </thead>
+        <tbody id="table-content">
+
+        </tbody>
+    </table>
+
+    <h2>Lägg till en ny produkt</h2>
+    <form action="/admin/add-product" method="POST">
+        <select name="product_category" required>
+            <option value="tobacco">Tobak</option>
+            <option value="candy">Godis</option>
+            <option value="food">Enkel mat</option>
+            <option value="magazine">Tidningar</option>
+        </select>
+        <input type="text" name="car_name" placeholder="Produktnamn" required>
+        <input type="number" name="cost" placeholder="Kostnad" required>
+        <input type="number" name="stock" placeholder="Lagersaldo">
+        <button type="submit">Lägg till produkt</button>
+    </form>
+
+
+    <script src="js/admin_panel.js"></script>
 </body>
 </html>

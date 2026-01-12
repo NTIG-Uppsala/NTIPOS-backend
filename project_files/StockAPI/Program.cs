@@ -14,6 +14,8 @@ if (!File.Exists(DatabaseHelper.fileLocation))
 
 apiEndpoints.MapGet("/products/{id}", DatabaseHelper.ReadProduct);
 
+app.UsePathBase("/admin");
+app.UseDefaultFiles();
 app.UseStaticFiles();
 app.MapStaticAssets().ShortCircuit();
 
