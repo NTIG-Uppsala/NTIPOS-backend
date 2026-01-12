@@ -1,13 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data.SQLite;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Helpers
 {
@@ -319,20 +310,6 @@ namespace Helpers
             }
 
             return result;
-        }
-
-        public static string ReadData(string query)
-        {
-            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
-            {
-                connection.Open();
-
-                using (var cmd = new SQLiteCommand(query, connection))
-                {
-                    object result = cmd.ExecuteScalar();
-                    return result == null ? "" : result.ToString();
-                }
-            }
         }
     }
 }
