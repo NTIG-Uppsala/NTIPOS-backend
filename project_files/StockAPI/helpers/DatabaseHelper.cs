@@ -13,22 +13,13 @@ namespace Helpers
 {
     class Product
     {
-        public int id;
-        public string? name;
-        public int categoryID;
-        public float price;
-        public int stock;
-        public string? createdAt;
-        public string? updatedAt;
-    }
-
-    class HalfProduct
-    {
-        public int id;
-        public string? name;
-        public int category;
-        public float price;
-        public int stock;
+        public int id {get; set;}
+        public string? name {get; set;}
+        public int category {get; set;}
+        public float price {get; set;}
+        public int stock {get; set;}
+        public string? createdAt {get; set;}
+        public string? updatedAt {get; set;}
     }
 
     class DatabaseHelper
@@ -116,28 +107,28 @@ namespace Helpers
         {
             var products = new[]
             {
-                new Product{ name = "Marlboro Red (20-pack)", categoryID = 1, price = 89.00F, stock = 100 },
-                new Product{ name = "Camel Blue (20-pack)", categoryID = 1, price = 85.00F, stock = 100 },
-                new Product{ name = "L&M Filter (20-pack)", categoryID = 1, price = 79.00F, stock = 100 },
-                new Product{ name = "Skruf Original Portion", categoryID = 1, price = 62.00F, stock = 100 },
-                new Product{ name = "Göteborgs Rapé White Portion", categoryID = 1, price = 67.00F, stock = 100 },
+                new Product{ name = "Marlboro Red (20-pack)", category = 1, price = 89.00F, stock = 100 },
+                new Product{ name = "Camel Blue (20-pack)", category = 1, price = 85.00F, stock = 100 },
+                new Product{ name = "L&M Filter (20-pack)", category = 1, price = 79.00F, stock = 100 },
+                new Product{ name = "Skruf Original Portion", category = 1, price = 62.00F, stock = 100 },
+                new Product{ name = "Göteborgs Rapé White Portion", category = 1, price = 67.00F, stock = 100 },
 
-                new Product{ name = "Marabou Mjölkchoklad 100 g", categoryID = 2, price = 25.00F, stock = 100 },
-                new Product{ name = "Daim dubbel", categoryID = 2, price = 15.00F, stock = 100 },
-                new Product{ name = "Kexchoklad", categoryID = 2, price = 12.00F, stock = 100 },
-                new Product{ name = "Malaco Gott & Blandat 160 g", categoryID = 2, price = 28.00F, stock = 100 },
+                new Product{ name = "Marabou Mjölkchoklad 100 g", category = 2, price = 25.00F, stock = 100 },
+                new Product{ name = "Daim dubbel", category = 2, price = 15.00F, stock = 100 },
+                new Product{ name = "Kexchoklad", category = 2, price = 12.00F, stock = 100 },
+                new Product{ name = "Malaco Gott & Blandat 160 g", category = 2, price = 28.00F, stock = 100 },
 
-                new Product{ name = "Korv med bröd", categoryID = 3, price = 25.00F, stock = 100 },
-                new Product{ name = "Varm toast (ost & skinka)", categoryID = 3, price = 30.00F, stock = 100 },
-                new Product{ name = "Pirog (köttfärs)", categoryID = 3, price = 22.00F, stock = 100 },
-                new Product{ name = "Färdig sallad (kyckling)", categoryID = 3, price = 49.00F, stock = 100 },
-                new Product{ name = "Panini (mozzarella & pesto)", categoryID = 3, price = 45.00F, stock = 100 },
+                new Product{ name = "Korv med bröd", category = 3, price = 25.00F, stock = 100 },
+                new Product{ name = "Varm toast (ost & skinka)", category = 3, price = 30.00F, stock = 100 },
+                new Product{ name = "Pirog (köttfärs)", category = 3, price = 22.00F, stock = 100 },
+                new Product{ name = "Färdig sallad (kyckling)", category = 3, price = 49.00F, stock = 100 },
+                new Product{ name = "Panini (mozzarella & pesto)", category = 3, price = 45.00F, stock = 100 },
 
-                new Product{ name = "Aftonbladet (dagens)", categoryID = 4, price = 28.00F, stock = 100 },
-                new Product{ name = "Expressen (dagens)", categoryID = 4, price = 28.00F, stock = 100 },
-                new Product{ name = "Illustrerad Vetenskap", categoryID = 4, price = 79.00F, stock = 100 },
-                new Product{ name = "Kalle Anka & Co", categoryID = 4, price = 45.00F, stock = 100 },
-                new Product{ name = "Allt om Mat", categoryID = 4, price = 69.00F, stock = 100 },
+                new Product{ name = "Aftonbladet (dagens)", category = 4, price = 28.00F, stock = 100 },
+                new Product{ name = "Expressen (dagens)", category = 4, price = 28.00F, stock = 100 },
+                new Product{ name = "Illustrerad Vetenskap", category = 4, price = 79.00F, stock = 100 },
+                new Product{ name = "Kalle Anka & Co", category = 4, price = 45.00F, stock = 100 },
+                new Product{ name = "Allt om Mat", category = 4, price = 69.00F, stock = 100 },
 
             };
 
@@ -164,7 +155,7 @@ namespace Helpers
                     string timestamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
                     cmd.Parameters["@name"].Value = product.name;
-                    cmd.Parameters["@categoryId"].Value = product.categoryID;
+                    cmd.Parameters["@categoryId"].Value = product.category;
                     cmd.Parameters["@price"].Value = product.price;
                     cmd.Parameters["@stock"].Value = product.stock;
                     cmd.Parameters["@createdAt"].Value = timestamp;
@@ -242,13 +233,47 @@ namespace Helpers
             return result;
         }
 
-        public static IResult DeleteProduct(int productId)
+        public static object UpdateProduct(Product product, int id)
+        {
+            object result = new {};
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var cmd = new SQLiteCommand($@"
+                            UPDATE products 
+                            SET name = '{product.name}', 
+                                categoryId = '{product.category}', 
+                                price = '{product.price}'
+                            WHERE id = {id}
+                            RETURNING *", connection))
+                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            result = new{
+                                id = id,
+                                name = reader.GetString(reader.GetOrdinal("name")),
+                                category = reader.GetInt32(reader.GetOrdinal("categoryId")),
+                                price = reader.GetFloat(reader.GetOrdinal("price")),
+                                stock = reader.GetInt32(reader.GetOrdinal("stock"))
+                            };
+                        }
+                        else return Results.StatusCode(204);
+                    }
+            }
+
+            return result;
+        }
+
+        public static IResult DeleteProduct(int id)
         {
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
 
-                using (var cmd = new SQLiteCommand($"DELETE FROM products WHERE id = {productId}", connection))
+                using (var cmd = new SQLiteCommand($"DELETE FROM products WHERE id = {id}", connection))
                     cmd.ExecuteNonQuery();
             }
 

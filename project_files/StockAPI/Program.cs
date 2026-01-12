@@ -16,6 +16,8 @@ apiEndpoints.MapGet("/products/", DatabaseHelper.ReadAllProducts);
 
 apiEndpoints.MapGet("/products/{id}", DatabaseHelper.ReadProduct);
 
-apiEndpoints.MapDelete("/products/{productId}", DatabaseHelper.DeleteProduct);
+apiEndpoints.MapPut("/products/{id}", DatabaseHelper.UpdateProduct);
+
+apiEndpoints.MapDelete("/products/{id}", DatabaseHelper.DeleteProduct);
 
 app.Run();
