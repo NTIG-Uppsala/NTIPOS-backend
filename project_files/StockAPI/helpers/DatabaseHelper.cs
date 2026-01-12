@@ -134,8 +134,10 @@ namespace Helpers
 
             foreach (var product in products){AddProduct(product);}
         }
-        public static string AddProduct(Product product)
+        public static object AddProduct(Product product)
         {
+            object result = new {};
+
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
@@ -165,14 +167,18 @@ namespace Helpers
                     {
                         if (reader.Read())
                         {
-                            product.id = reader.GetInt32(reader.GetOrdinal("id"));
-                            product.createdAt = reader.GetString(reader.GetOrdinal("createdAt"));
-                            product.updatedAt = reader.GetString(reader.GetOrdinal("updatedAt"));
+                            result = new{
+                                id = reader.GetInt32(reader.GetOrdinal("id")),
+                                name = product.name, 
+                                category = product.category, 
+                                stock = product.stock,
+                                createdAt = reader.GetString(reader.GetOrdinal("createdAt")),
+                                updatedAt = reader.GetString(reader.GetOrdinal("updatedAt")),
+                            };
                         }
                     }
                 }
 
-                string result = "fix";
                 return result;
             }
         }

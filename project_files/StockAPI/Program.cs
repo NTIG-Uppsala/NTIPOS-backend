@@ -12,6 +12,8 @@ if (!File.Exists(DatabaseHelper.fileLocation))
     DatabaseHelper.AddProducts();
 }
 
+apiEndpoints.MapPost("/products/", DatabaseHelper.AddProduct);
+
 apiEndpoints.MapGet("/products/", DatabaseHelper.ReadAllProducts);
 
 apiEndpoints.MapGet("/products/{id}", DatabaseHelper.ReadProduct);
