@@ -1,4 +1,5 @@
 using Helpers;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
@@ -21,5 +22,15 @@ apiEndpoints.MapGet("/products/{id}", DatabaseHelper.ReadProduct);
 apiEndpoints.MapPut("/products/{id}", DatabaseHelper.UpdateProduct);
 
 apiEndpoints.MapDelete("/products/{id}", DatabaseHelper.DeleteProduct);
+
+apiEndpoints.MapPost("/products/{id}/stock/add", (int id, StockInput body) => 
+            {
+            return DatabaseHelper.EditStock(id, body.amount);
+            });
+
+apiEndpoints.MapPost("/products/{id}/stock/remove", (int id, StockInput body) => 
+            {
+            return DatabaseHelper.EditStock(id, body.amount * -1);
+            });
 
 app.Run();

@@ -11,6 +11,11 @@ using System.Threading.Tasks;
 
 namespace Helpers
 {
+    class StockInput
+    {
+        public int amount {get; set;}
+    }
+
     class Product
     {
         public int id {get; set;}
@@ -134,6 +139,7 @@ namespace Helpers
 
             foreach (var product in products){AddProduct(product);}
         }
+
         public static object AddProduct(Product product)
         {
             object result = new {};
@@ -284,6 +290,35 @@ namespace Helpers
             }
 
             return Results.StatusCode(204);
+        }
+
+        public static object EditStock(int id, int amount)
+        {
+            object result = new {};
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var cmd = new SQLiteCommand($@"
+                            UPDATE products 
+                            SET stock = stock + '{amount}' 
+                            WHERE id = {id}
+                            RETURNING stock", connection))
+                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            result = new{
+                                id = id,
+                                stock = reader.GetInt32(reader.GetOrdinal("stock"))
+                            };
+                        }
+                        else return Results.StatusCode(204);
+                    }
+            }
+
+            return result;
         }
 
         public static string ReadData(string query)
