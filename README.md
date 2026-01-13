@@ -6,6 +6,7 @@ A backend for [NTIPOS](https://github.com/NTIG-Uppsala/NTIPOS)
 
 ## API Documentation
 * [Version 1](_dev_info/API_documentation/API_documentation_V1.md)
+* [Version 2](_dev_info/API_documentation/API_documentation_V2.md)
 
 ## Links to dev info docs (from [NTIPOS](https://github.com/NTIG-Uppsala/NTIPOS))
 
