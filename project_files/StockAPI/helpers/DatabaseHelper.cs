@@ -28,7 +28,7 @@ namespace Helpers
             if (!File.Exists(fileLocation))
             {
                 FileInfo file = new FileInfo(fileLocation);
-                file.Directory.Create();
+                file.Directory?.Create();
                 SQLiteConnection.CreateFile(fileLocation);
 
                 using (var connection = new SQLiteConnection(connectionString))
