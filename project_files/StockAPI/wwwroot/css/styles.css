@@ -10,7 +10,7 @@ body {
     background-color: #f4f4f4;
 }
 
-/* Main adming panel page */
+/* Main admin panel page */
 
 table {
     background-color: white;
@@ -52,32 +52,4 @@ input::-webkit-inner-spin-button {
 
 input[type=number] {
   -moz-appearance: textfield;
-}
-
-/* Error page */
-
-.errorContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  margin-top: 45vh;
-  align-items: center;
-  justify-content: center;
-}
-
-.errorMessage {
-  color: red;
-  font-weight: bold;
-  font-size: 26px;
-}
-
-.errorBackLink {
-  font-weight: 600;
-  font-size: 26px;
-  color: black;
-  text-decoration: none;
-}
-
-.errorBackLink:hover {
-  text-decoration: underline;
 }

@@ -17,29 +17,25 @@
                 <th>Produktnamn</th>
                 <th>Pris</th>
                 <th>Lagersaldo</th>
-                <th>Redigera</th>
                 <th>Ta bort</th>
             </tr>
         </thead>
-        <tbody id="table-content">
-
-        </tbody>
+        <tbody id="table-content"></tbody>
     </table>
 
     <h2>Lägg till en ny produkt</h2>
-    <form action="/admin/add-product" method="POST">
-        <select name="product_category" required>
-            <option value="tobacco">Tobak</option>
-            <option value="candy">Godis</option>
-            <option value="food">Enkel mat</option>
-            <option value="magazine">Tidningar</option>
+    <form action="javascript:void(0)" id="add-product-form">
+        <select name="category" required>
+            <option value="1">Tobak</option>
+            <option value="2">Godis</option>
+            <option value="3">Enkel mat</option>
+            <option value="4">Tidningar</option>
         </select>
-        <input type="text" name="car_name" placeholder="Produktnamn" required>
-        <input type="number" name="cost" placeholder="Kostnad" required>
+        <input type="text" name="name" placeholder="Produktnamn" required>
+        <input type="number" name="price" placeholder="Kostnad" required>
         <input type="number" name="stock" placeholder="Lagersaldo">
-        <button type="submit">Lägg till produkt</button>
+        <button id="add-product-btn" type="submit">Lägg till produkt</button>
     </form>
-
 
     <script src="js/admin_panel.js"></script>
 </body>
