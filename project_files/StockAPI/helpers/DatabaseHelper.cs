@@ -239,6 +239,7 @@ namespace Helpers
         public static object UpdateProduct(Product product, int id)
         {
             object result = new {};
+            string timestamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
@@ -248,7 +249,8 @@ namespace Helpers
                             UPDATE products 
                             SET name = '{product.name}', 
                                 categoryId = '{product.category}', 
-                                price = '{product.price}'
+                                price = '{product.price}',
+                                updatedAt = '{timestamp}'
                             WHERE id = {id}
                             RETURNING *", connection))
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
@@ -286,6 +288,7 @@ namespace Helpers
         public static object EditStock(int id, int amount)
         {
             object result = new {};
+            string timestamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
@@ -293,7 +296,8 @@ namespace Helpers
 
                 using (var cmd = new SQLiteCommand($@"
                             UPDATE products 
-                            SET stock = stock + '{amount}' 
+                            SET stock = stock + '{amount}' ,
+                            updatedAt = '{timestamp}'
                             WHERE id = {id}
                             RETURNING stock", connection))
                     using (SQLiteDataReader reader = cmd.ExecuteReader())
