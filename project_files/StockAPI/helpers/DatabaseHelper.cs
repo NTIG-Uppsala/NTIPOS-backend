@@ -18,6 +18,15 @@ namespace Helpers
         public string? updatedAt {get; set;}
     }
 
+    class Category
+    {
+        public int id {get; set;}
+        public string? name {get; set;}
+        public string? color {get; set;}
+        public string? createdAt {get; set;}
+        public string? updatedAt {get; set;}
+    }
+
     class DatabaseHelper
     {
         public static readonly string fileLocation = "databases/products.db";
@@ -39,7 +48,9 @@ namespace Helpers
                     CREATE TABLE IF NOT EXISTS categories(
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
                             categoryName TEXT NOT NULL,
-                            categoryColor TEXT NOT NULL
+                            categoryColor TEXT NOT NULL,
+                            createdAt STRING NOT NULL,
+                            updatedAt STRING NOT NULL
                     );";
 
                     string createProductsTableQuery = @"
@@ -70,32 +81,56 @@ namespace Helpers
         {
             var categories = new[]
             {
-                new { Name = "Tobak", Color = "SaddleBrown"},
-                new { Name = "Godis", Color = "LightPink"},
-                new { Name = "Enkel mat", Color = "Orange"},
-                new { Name = "Tidningar", Color = "LightBlue"},
+                new Category{ name = "Tobak", color = "8b4513"},
+                new Category{ name = "Godis", color = "ffb6c1"},
+                new Category{ name = "Enkel mat", color = "ffa500"},
+                new Category{ name = "Tidningar", color = "add8e6"},
             };
+
+                    foreach (var category in categories){AddCategory(category);}
+        }
+
+        public static object AddCategory(Category category)
+        {
+            object result = new {};
 
             using (SQLiteConnection connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
 
-                using (var tx = connection.BeginTransaction())
                 using (var cmd = new SQLiteCommand(@"
-                            INSERT INTO categories(CategoryName, CategoryColor)
-                            VALUES (@categoryName, @categoryColor)", connection, tx))
+                            INSERT INTO categories(CategoryName, CategoryColor, CreatedAt, UpdatedAt)
+                            VALUES (@categoryName, @categoryColor, @createdAt, @updatedAt)
+                            RETURNING id", connection))
                 {
                     cmd.Parameters.Add(new SQLiteParameter("@categoryName"));
                     cmd.Parameters.Add(new SQLiteParameter("@categoryColor"));
+                    cmd.Parameters.Add(new SQLiteParameter("@createdAt"));
+                    cmd.Parameters.Add(new SQLiteParameter("@updatedAt"));
 
-                    foreach (var category in categories)
+                    string timestamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
+
+                    cmd.Parameters["@categoryName"].Value = category.name;
+                    cmd.Parameters["@categoryColor"].Value = category.color;
+                    cmd.Parameters["@createdAt"].Value = timestamp;
+                    cmd.Parameters["@updatedAt"].Value = timestamp;
+
+                    using (SQLiteDataReader reader = cmd.ExecuteReader())
                     {
-                        cmd.Parameters["@categoryName"].Value = category.Name;
-                        cmd.Parameters["@categoryColor"].Value = category.Color;
-                        cmd.ExecuteNonQuery();
+                        if (reader.Read())
+                        {
+                            result = new{
+                                id = reader.GetInt32(reader.GetOrdinal("id")),
+                                name = category.name, 
+                                color = category.color,
+                                createdAt = timestamp,
+                                updatedAt = timestamp,
+                            };
+                        }
                     }
-                    tx.Commit();
                 }
+
+                return Results.Created("", result);
             }
         }
 
@@ -142,7 +177,7 @@ namespace Helpers
                 using (var cmd = new SQLiteCommand(@"
                             INSERT INTO products(Name, CategoryID, Price, Stock, CreatedAt, UpdatedAt)
                             VALUES (@name, @categoryId, @price, @stock, @createdAt, @updatedAt)
-                            RETURNING id, createdAt, updatedAt", connection))
+                            RETURNING id", connection))
                 {
                     cmd.Parameters.Add(new SQLiteParameter("@name"));
                     cmd.Parameters.Add(new SQLiteParameter("@categoryId"));
@@ -168,15 +203,16 @@ namespace Helpers
                                 id = reader.GetInt32(reader.GetOrdinal("id")),
                                 name = product.name, 
                                 category = product.category, 
+                                price = product.price,
                                 stock = product.stock,
-                                createdAt = reader.GetString(reader.GetOrdinal("createdAt")),
-                                updatedAt = reader.GetString(reader.GetOrdinal("updatedAt")),
+                                createdAt = timestamp,
+                                updatedAt = timestamp,
                             };
                         }
                     }
                 }
 
-                return result;
+                return Results.Created("", result);
             }
         }
 
@@ -250,6 +286,7 @@ namespace Helpers
                             SET name = '{product.name}', 
                                 categoryId = '{product.category}', 
                                 price = '{product.price}',
+                                stock = '{product.stock}',
                                 updatedAt = '{timestamp}'
                             WHERE id = {id}
                             RETURNING *", connection))
@@ -314,6 +351,104 @@ namespace Helpers
             }
 
             return result;
+        }
+
+        public static object ReadCategory(int id)
+        {
+            object result = new {};
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var cmd = new SQLiteCommand($"SELECT * FROM categories WHERE id = {id}", connection))
+                using (SQLiteDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        result = new{
+                            id = id,
+                            name = reader.GetString(reader.GetOrdinal("categoryName")),
+                            color = reader.GetString(reader.GetOrdinal("categoryColor")),
+                        };
+                    }
+                    else return Results.StatusCode(204);
+                }
+            }
+            return result;
+        }
+
+        public static List<object> ReadAllCategories()
+        {
+            List<object> result = new List<object>();
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var cmd = new SQLiteCommand($"SELECT * FROM categories", connection))
+                using (SQLiteDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        object category = new{
+                            id = reader.GetInt32(reader.GetOrdinal("id")),
+                            name = reader.GetString(reader.GetOrdinal("categoryName")),
+                            color = reader.GetString(reader.GetOrdinal("categoryColor")),
+                        };
+
+                        result.Add(category);
+                    };
+                }
+            }
+
+            return result;
+        }
+//
+        public static object UpdateCategory(Category category, int id)
+        {
+            object result = new {};
+            string timestamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
+
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var cmd = new SQLiteCommand($@"
+                            UPDATE categories 
+                            SET categoryName = '{category.name}', 
+                                categoryColor = '{category.color}',
+                                updatedAt = '{timestamp}'
+                            WHERE id = {id}
+                            RETURNING *", connection))
+                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            result = new{
+                                id = id,
+                                name = reader.GetString(reader.GetOrdinal("categoryName")),
+                                color = reader.GetString(reader.GetOrdinal("categoryColor")),
+                            };
+                        }
+                        else return Results.StatusCode(204);
+                    }
+            }
+
+            return result;
+        }
+
+        public static IResult DeleteCategory(int id)
+        {
+            using (SQLiteConnection connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var cmd = new SQLiteCommand($"DELETE FROM categories WHERE id = {id}", connection))
+                    cmd.ExecuteNonQuery();
+            }
+
+            return Results.StatusCode(204);
         }
     }
 }

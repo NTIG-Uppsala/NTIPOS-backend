@@ -1,4 +1,6 @@
-# Product Inventory API v1
+# ~~Product Inventory API v1~~ DEPRICATED!
+
+This version of the API is **DEPRICATED** and is not suported!
 
 ## Overview
 

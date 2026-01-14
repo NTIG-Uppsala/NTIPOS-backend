@@ -3,7 +3,9 @@ using Helpers;
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
-var apiEndpoints = app.MapGroup("/api/v1");
+var apiEndpoints = app.MapGroup("/api/v2");
+var products = apiEndpoints.MapGroup("/products");
+var categories = apiEndpoints.MapGroup("/categories");
 
 if (!File.Exists(DatabaseHelper.fileLocation))
 {
@@ -12,26 +14,35 @@ if (!File.Exists(DatabaseHelper.fileLocation))
     DatabaseHelper.AddProducts();
 }
 
-apiEndpoints.MapPost("/products/", DatabaseHelper.AddProduct);
+products.MapPost("/", DatabaseHelper.AddProduct);
 
-apiEndpoints.MapGet("/products/", DatabaseHelper.ReadAllProducts);
+products.MapGet("/", DatabaseHelper.ReadAllProducts);
 
-apiEndpoints.MapGet("/products/{id}", DatabaseHelper.ReadProduct);
+products.MapGet("/{id}", DatabaseHelper.ReadProduct);
 
-apiEndpoints.MapPut("/products/{id}", DatabaseHelper.UpdateProduct);
+products.MapPut("/{id}", DatabaseHelper.UpdateProduct);
 
-apiEndpoints.MapDelete("/products/{id}", DatabaseHelper.DeleteProduct);
+products.MapDelete("/{id}", DatabaseHelper.DeleteProduct);
 
-apiEndpoints.MapPost("/products/{id}/stock/add", (int id, StockInput body) =>
+products.MapPost("/{id}/stock/add", (int id, StockInput body) =>
 {
     return DatabaseHelper.EditStock(id, body.amount);
 });
 
-apiEndpoints.MapPost("/products/{id}/stock/remove", (int id, StockInput body) =>
+products.MapPost("/{id}/stock/remove", (int id, StockInput body) =>
 {
     return DatabaseHelper.EditStock(id, body.amount * -1);
 });
 
+categories.MapPost("/", DatabaseHelper.AddCategory);
+
+categories.MapGet("/", DatabaseHelper.ReadAllCategories);
+
+categories.MapGet("/{id}", DatabaseHelper.ReadCategory);
+
+categories.MapPut("/{id}", DatabaseHelper.UpdateCategory);
+
+categories.MapDelete("/{id}", DatabaseHelper.DeleteCategory);
 
 app.UsePathBase("/admin");
 app.UseDefaultFiles();
