@@ -7,30 +7,56 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <h1>Alla produkter</h1>
+    <div class="section">
+        <h1>Alla produkter</h1>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Kategori</th>
-                <th>Produktnamn</th>
-                <th>Pris</th>
-                <th>Lagersaldo</th>
-                <th>Ta bort</th>
-            </tr>
-        </thead>
-        <tbody id="table-content"></tbody>
-    </table>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Kategori</th>
+                    <th>Produktnamn</th>
+                    <th>Pris</th>
+                    <th>Lagersaldo</th>
+                    <th>Ta bort</th>
+                </tr>
+            </thead>
+            <tbody id="product-table-content"></tbody>
+        </table>
 
-    <h2>Lägg till en ny produkt</h2>
-    <form action="javascript:void(0)" id="add-product-form">
-        <select id="categorySelector" name="category" required></select>
-        <input type="text" name="name" placeholder="Produktnamn" required>
-        <input type="number" name="price" placeholder="Kostnad" required>
-        <input type="number" name="stock" placeholder="Lagersaldo">
-        <button id="add-product-btn" type="submit">Lägg till produkt</button>
-    </form>
+        <h2>Lägg till en ny produkt</h2>
+        <form action="javascript:void(0)" id="add-product-form">
+            <select id="category-selector" name="category" required></select>
+            <input type="text" name="name" placeholder="Produktnamn" required>
+            <input type="number" name="price" placeholder="Kostnad" required>
+            <input type="number" name="stock" placeholder="Lagersaldo">
+            <button id="add-product-btn" type="submit">Lägg till produkt</button>
+        </form>
+    </div> 
+
+    <div class="section">
+        <h1>Alla kategorier</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Kategorinamn</th>
+                    <th>Kategorifärg</th>
+                    <th>Ta bort</th>
+                </tr>
+            </thead>
+            <tbody id="category-table-content"></tbody>
+        </table>
+
+        <h2>Lägg till en ny kategori</h2>
+        <form action="javascript:void(0)" id="add-category-form">
+            <input type="text" name="name" placeholder="Kategorinamn" required>
+            <label for="color-picker">Kategorifärg:</label>
+            <input id="color-picker" type="color" name="color" placeholder="Kategorifärg" required>
+            <button id="add-product-btn" type="submit">Lägg till kategori</button>
+        </form>
+    </div>
 
     <script src="js/admin_panel.js"></script>
 </body>

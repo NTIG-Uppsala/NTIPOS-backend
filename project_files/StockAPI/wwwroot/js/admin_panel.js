@@ -1,4 +1,5 @@
 const addProductForm = document.getElementById("add-product-form")
+const addCategoryForm = document.getElementById("add-category-form")
 
 const allProducts = []
 
@@ -10,19 +11,27 @@ document.addEventListener("DOMContentLoaded", () => {
 })
 
 addProductForm.onsubmit = function() {
-    var formData = new FormData(document.getElementById("add-product-form"))
+    var formData = new FormData(addProductForm)
     formData = Object.fromEntries(formData)
     formData.stock = formData.stock == "" ? 0 : formData.stock
     fetch("/api/v2/products", {method: "POST", body: JSON.stringify(formData), headers: {"Content-Type": "application/json",}})
     window.location.reload()
 }
 
-async function deleteProductButton(productID, productName) {
-    let doDelete = confirm(`Är du säker på att du vill ta bort ${productName} från produktlistan?`)
-    if (doDelete) {
-        await fetch(`/api/v2/products/${productID}`, {method: "DELETE"})
-    }
+addCategoryForm.onsubmit = function() {
+    var formData = new FormData(addCategoryForm)
+    formData = Object.fromEntries(formData)
+    formData.color = formData.color.replace("#","")
+    fetch("/api/v2/categories", {method: "POST", body: JSON.stringify(formData), headers: {"Content-Type": "application/json",}})
     window.location.reload()
+}
+
+async function deleteItem(ID, name, itemCategory, messageCategory) {
+    let doDelete = confirm(`Är du säker på att du vill ta bort ${name} från ${messageCategory}?`)
+    if (doDelete) {
+        await fetch(`/api/v2/${itemCategory}/${ID}`, {method: "DELETE"})
+        window.location.reload()
+    }
 }
 
 async function fetchData() {
@@ -48,21 +57,22 @@ function waitForData() {
     setTimeout(waitForData, 10);
   } else {
     insertCategoryProperties()
-    populateTable()
-    populateCategories()
+    populateTables()
+    populateCategorySelector()
   }
 }
 
 function insertCategoryProperties() {
     allProducts.forEach(product => {
         let category = allCategories.find(value => { return value.id == product.category})
+        category = category != null ? category : {name: "Ingen kategori", color: "ffffff"}
         product.category = category.name
         product.color = category.color
     })
 }
 
-function populateCategories() {
-    const categorySelector = document.getElementById("categorySelector")
+function populateCategorySelector() {
+    const categorySelector = document.getElementById("category-selector")
 
     if (allCategories && allCategories.length > 0) {
         allCategories.forEach(category => {
@@ -75,10 +85,16 @@ function populateCategories() {
     }
 }
 
-function populateTable() {
-    const tableContent = document.getElementById("table-content")
+function populateTables() {
+    populateProductTable()
+    populateCategoryTable()
+}
+
+function populateProductTable() {
+    const tableContent = document.getElementById("product-table-content")
 
     const AMOUNT_OF_COLUMNS = 6 // The total amount of columns on the table
+
 
     if (allProducts && allProducts.length > 0) {
         allProducts.forEach(product => {
@@ -91,7 +107,6 @@ function populateTable() {
                     case 0: cellContent = product.id; break;
                     case 1: 
                         cellContent = document.createElement('DIV');
-                        console.log(product.color)
                         cellContent.style.backgroundColor = `#${product.color}`
                         cellContent.style.margin = "-8px"
                         cellContent.style.padding = "8px"
@@ -100,14 +115,9 @@ function populateTable() {
                     case 3: cellContent = product.price.toLocaleString("sv-SE") + " kr"; break;
                     case 4: cellContent = product.stock; break;
                     case 5: 
-                        cellContent = document.createElement('form')
-                        cellContent.action = `/api/v2/products/${product.id}`
-                        cellContent.method = "DELETE"
-                        let delBtn = document.createElement('button')
-                        delBtn.type = "submit"
-                        delBtn.addEventListener("click", () => deleteProductButton(product.id, product.name))
-                        delBtn.textContent = "Ta bort"
-                        cellContent.appendChild(delBtn)
+                        cellContent = document.createElement('button')
+                        cellContent.addEventListener("click", () => deleteItem(product.id, product.name, "products", "produktlistan"))
+                        cellContent.textContent = "Ta bort"
                         break
                 }
 
@@ -118,6 +128,48 @@ function populateTable() {
                 }
 
                 productRow.appendChild(productDataCell);
+            }
+            tableContent.appendChild(productRow)
+        })
+    }
+}
+
+function populateCategoryTable() {
+    const tableContent = document.getElementById("category-table-content")
+
+    const AMOUNT_OF_COLUMNS = 4 // The total amount of columns on the table
+
+
+    if (allCategories && allCategories.length > 0) {
+        allCategories.forEach(category => {
+            let productRow = document.createElement('TR')
+
+            for (let i = 0; i < AMOUNT_OF_COLUMNS; i++) {
+                const categoryDataCell = document.createElement('TD');
+                let cellContent;
+                switch(i) {
+                    case 0: cellContent = category.id; break;
+                    case 1: cellContent = category.name; break;
+                    case 2: 
+                        cellContent = document.createElement('DIV');
+                        cellContent.style.backgroundColor = `#${category.color}`
+                        cellContent.style.margin = "-8px"
+                        cellContent.style.padding = "8px"
+                        cellContent.textContent = "#" + category.color; break;
+                    case 3: 
+                        cellContent = document.createElement('button')
+                        cellContent.addEventListener("click", () => deleteItem(category.id, category.name, "categories", "kategorilistan"))
+                        cellContent.textContent = "Ta bort"
+                        break
+                }
+
+                if (typeof(cellContent) == "string" || typeof(cellContent) == "number") {
+                    categoryDataCell.appendChild(document.createTextNode(cellContent));
+                } else {
+                    categoryDataCell.appendChild(cellContent)
+                }
+
+                productRow.appendChild(categoryDataCell);
             }
             tableContent.appendChild(productRow)
         })
