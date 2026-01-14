@@ -13,7 +13,7 @@ addProductForm.onsubmit = function() {
     var formData = new FormData(document.getElementById("add-product-form"))
     formData = Object.fromEntries(formData)
     formData.stock = formData.stock == "" ? 0 : formData.stock
-    console.log(fetch("/api/v2/products", {method: "POST", body: JSON.stringify(formData), headers: {"Content-Type": "application/json",}}))
+    fetch("/api/v2/products", {method: "POST", body: JSON.stringify(formData), headers: {"Content-Type": "application/json",}})
     window.location.reload()
 }
 
@@ -38,17 +38,41 @@ async function fetchData() {
         .then((response) => response.text())
         .then((result) => {
         const CATEGORIES_OBJ = JSON.parse(result);
-        CATEGORIES_OBJ.forEach(category => allProducts.push(category));
+        CATEGORIES_OBJ.forEach(category => allCategories.push(category));
         })
         .catch((error) => console.error(error));
 }
 
 function waitForData() {
-  if (allProducts.length === 0) {
+  if (allProducts.length === 0 || allCategories.length === 0) {
     setTimeout(waitForData, 10);
   } else {
+    insertCategoryProperties()
     populateTable()
+    populateCategories()
   }
+}
+
+function insertCategoryProperties() {
+    allProducts.forEach(product => {
+        let category = allCategories.find(value => { return value.id == product.category})
+        product.category = category.name
+        product.color = category.color
+    })
+}
+
+function populateCategories() {
+    const categorySelector = document.getElementById("categorySelector")
+
+    if (allCategories && allCategories.length > 0) {
+        allCategories.forEach(category => {
+            let categoryOption = document.createElement('OPTION')
+            categoryOption.value = category.id
+            categoryOption.textContent = category.name
+
+            categorySelector.appendChild(categoryOption)
+        })
+    }
 }
 
 function populateTable() {
@@ -65,7 +89,13 @@ function populateTable() {
                 let cellContent;
                 switch(i) {
                     case 0: cellContent = product.id; break;
-                    case 1: cellContent = product.category; break;
+                    case 1: 
+                        cellContent = document.createElement('DIV');
+                        console.log(product.color)
+                        cellContent.style.backgroundColor = `#${product.color}`
+                        cellContent.style.margin = "-8px"
+                        cellContent.style.padding = "8px"
+                        cellContent.textContent = product.category; break;
                     case 2: cellContent = product.name; break;
                     case 3: cellContent = product.price.toLocaleString("sv-SE") + " kr"; break;
                     case 4: cellContent = product.stock; break;

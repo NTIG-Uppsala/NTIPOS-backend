@@ -25,12 +25,7 @@
 
     <h2>Lägg till en ny produkt</h2>
     <form action="javascript:void(0)" id="add-product-form">
-        <select name="category" required>
-            <option value="1">Tobak</option>
-            <option value="2">Godis</option>
-            <option value="3">Enkel mat</option>
-            <option value="4">Tidningar</option>
-        </select>
+        <select id="categorySelector" name="category" required></select>
         <input type="text" name="name" placeholder="Produktnamn" required>
         <input type="number" name="price" placeholder="Kostnad" required>
         <input type="number" name="stock" placeholder="Lagersaldo">
