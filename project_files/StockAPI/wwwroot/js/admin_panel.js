@@ -5,7 +5,7 @@ const allProducts = []
 
 const allCategories = []
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     fetchData()
     waitForData()
 })
@@ -52,9 +52,9 @@ async function fetchData() {
         .catch((error) => console.error(error));
 }
 
-function waitForData() {
+async function waitForData() {
   if (allProducts.length === 0 || allCategories.length === 0) {
-    setTimeout(waitForData, 10);
+    await setTimeout(waitForData, 10);
   } else {
     insertCategoryProperties()
     populateTables()
@@ -66,6 +66,7 @@ function insertCategoryProperties() {
     allProducts.forEach(product => {
         let category = allCategories.find(value => { return value.id == product.category})
         category = category != null ? category : {name: "Ingen kategori", color: "ffffff"}
+        product.categoryId = product.category
         product.category = category.name
         product.color = category.color
     })
@@ -93,7 +94,7 @@ function populateTables() {
 function populateProductTable() {
     const tableContent = document.getElementById("product-table-content")
 
-    const AMOUNT_OF_COLUMNS = 6 // The total amount of columns on the table
+    const AMOUNT_OF_COLUMNS = 7 // The total amount of columns on the table
 
 
     if (allProducts && allProducts.length > 0) {
@@ -114,7 +115,12 @@ function populateProductTable() {
                     case 2: cellContent = product.name; break;
                     case 3: cellContent = product.price.toLocaleString("sv-SE") + " kr"; break;
                     case 4: cellContent = product.stock; break;
-                    case 5: 
+                    case 5:
+                        cellContent = document.createElement('button')
+                        cellContent.textContent = "Redigera"
+                        cellContent.addEventListener("click", () => editProduct(product, productRow))
+                        break
+                    case 6: 
                         cellContent = document.createElement('button')
                         cellContent.addEventListener("click", () => deleteItem(product.id, product.name, "products", "produktlistan"))
                         cellContent.textContent = "Ta bort"
@@ -137,12 +143,12 @@ function populateProductTable() {
 function populateCategoryTable() {
     const tableContent = document.getElementById("category-table-content")
 
-    const AMOUNT_OF_COLUMNS = 4 // The total amount of columns on the table
+    const AMOUNT_OF_COLUMNS = 5 // The total amount of columns on the table
 
 
     if (allCategories && allCategories.length > 0) {
         allCategories.forEach(category => {
-            let productRow = document.createElement('TR')
+            let categoryRow = document.createElement('TR')
 
             for (let i = 0; i < AMOUNT_OF_COLUMNS; i++) {
                 const categoryDataCell = document.createElement('TD');
@@ -156,7 +162,14 @@ function populateCategoryTable() {
                         cellContent.style.margin = "-8px"
                         cellContent.style.padding = "8px"
                         cellContent.textContent = "#" + category.color; break;
-                    case 3: 
+                    case 3:
+                        cellContent = document.createElement('button')
+                        cellContent.classList.add('editBtn')
+                        cellContent.setAttribute('data-id', category.id)
+                        cellContent.textContent = "Redigera"
+                        cellContent.addEventListener("click", () => editCategory(category, categoryRow))
+                        break
+                    case 4: 
                         cellContent = document.createElement('button')
                         cellContent.addEventListener("click", () => deleteItem(category.id, category.name, "categories", "kategorilistan"))
                         cellContent.textContent = "Ta bort"
@@ -169,10 +182,160 @@ function populateCategoryTable() {
                     categoryDataCell.appendChild(cellContent)
                 }
 
-                productRow.appendChild(categoryDataCell);
+                categoryRow.appendChild(categoryDataCell);
             }
-            tableContent.appendChild(productRow)
+            tableContent.appendChild(categoryRow)
         })
     }
 }
 
+function editProduct(product, productRow) {
+    const tableContent = document.getElementById("product-table-content")
+    let editRow = document.createElement('TR')
+    editRow.classList = 'edit-row'
+
+    let idDataCell = document.createElement('TD')
+    idDataCell.textContent = product.id
+    editRow.appendChild(idDataCell)
+
+    let editDataCell = document.createElement('TD')
+    let editForm = document.createElement('FORM')
+    editForm.action = "javascript:void(0)"
+    editDataCell.colSpan = 6
+    editDataCell.appendChild(editForm)
+
+    let categorySelector = document.createElement('SELECT');
+    categorySelector.name = "category"
+    allCategories.forEach(category => {
+        let categoryOption = document.createElement('OPTION')
+        categoryOption.value = category.id
+        categoryOption.textContent = category.name
+
+        categorySelector.appendChild(categoryOption)
+    })
+    categorySelector.value = product.categoryId
+
+    editForm.appendChild(categorySelector)
+
+    let productName = document.createElement('INPUT')
+    productName.style.width = "270px"
+    productName.name = "name"
+    productName.placeholder = "Produktnamn"
+    productName.value = product.name
+    productName.required = true
+
+    editForm.appendChild(productName)
+
+    let productPrice = document.createElement('INPUT')
+    productPrice.style.width = "25px"
+    productPrice.type = "number"
+    productPrice.name = "price"
+    productPrice.placeholder = "Pris"
+    productPrice.value = product.price
+    productPrice.required = true
+
+    editForm.appendChild(productPrice)
+    editForm.appendChild(document.createTextNode("kr "))
+
+    let productStock = document.createElement('INPUT')
+    productStock.style.width = "100px"
+    productStock.type = "number"
+    productStock.name = "stock"
+    productStock.placeholder = "Lagersaldo"
+    productStock.value = product.stock
+    productStock.required = true
+
+    editForm.appendChild(productStock)
+
+    let confirmButton = document.createElement('INPUT')
+    confirmButton.style.width = "70px"
+    confirmButton.type = "submit"
+    confirmButton.value = "Spara"
+    editForm.appendChild(confirmButton)
+
+    editForm.onsubmit = function() {
+        var formData = new FormData(editForm)
+        formData = Object.fromEntries(formData)
+        fetch(`/api/v2/products/${product.id}`, {method: "PUT", body: JSON.stringify(formData), headers: {"Content-Type": "application/json",}})
+        window.location.reload()
+    }
+
+    let abortButton = document.createElement('INPUT')
+    abortButton.type = "button"
+    abortButton.value = "Avbryt"
+    abortButton.addEventListener("click", () => {
+        tableContent.replaceChild(productRow, editRow)
+    })
+
+    editForm.appendChild(abortButton)
+
+    editRow.appendChild(editDataCell)
+
+    tableContent.replaceChild(editRow, productRow)
+}
+
+function editCategory(category, categoryRow) {
+    const tableContent = document.getElementById("category-table-content")
+    let editRow = document.createElement('TR')
+    editRow.classList = 'edit-row'
+
+    let idDataCell = document.createElement('TD')
+    idDataCell.textContent = category.id
+    editRow.appendChild(idDataCell)
+
+    let editDataCell = document.createElement('TD')
+    let editForm = document.createElement('FORM')
+    editForm.action = "javascript:void(0)"
+    editDataCell.colSpan = 4
+    editDataCell.appendChild(editForm)
+
+    let categoryName = document.createElement('INPUT')
+    categoryName.name = "name"
+    categoryName.placeholder = "Produktnamn"
+    categoryName.value = category.name
+    categoryName.required = true
+
+    editForm.appendChild(categoryName)
+
+    let colorLabel = document.createElement('LABEL')
+    colorLabel.htmlFor = "edit-color"
+    colorLabel.textContent = "Kategorifärg:"
+
+    editForm.appendChild(colorLabel)
+
+    let categoryColor = document.createElement('INPUT')
+    categoryColor.id = "edit-color"
+    categoryColor.type = "color"
+    categoryColor.name = "color"
+    categoryColor.value = "#" + category.color
+    categoryColor.required = true
+
+    editForm.appendChild(categoryColor)
+
+    let confirmButton = document.createElement('INPUT')
+    confirmButton.type = "submit"
+    confirmButton.value = "Spara"
+
+    editForm.appendChild(confirmButton)
+
+    editForm.onsubmit = function() {
+        var formData = new FormData(editForm)
+        formData = Object.fromEntries(formData)
+        formData.color = formData.color.replace("#","")
+        fetch(`/api/v2/categories/${category.id}`, {method: "PUT", body: JSON.stringify(formData), headers: {"Content-Type": "application/json",}})
+        window.location.reload()
+    }
+
+    let abortButton = document.createElement('INPUT')
+    abortButton.type = "button"
+    abortButton.value = "Avbryt"
+    abortButton.addEventListener("click", () => {
+        tableContent.replaceChild(categoryRow, editRow)
+    })
+
+    editForm.appendChild(abortButton)
+
+    editRow.appendChild(editDataCell)
+
+    tableContent.replaceChild(editRow, categoryRow)
+}

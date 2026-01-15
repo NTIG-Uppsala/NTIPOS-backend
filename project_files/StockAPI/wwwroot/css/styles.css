@@ -35,18 +35,21 @@ td, th {
     text-align: left;
 }
 
-.editRow {
-    display: none;
-    background-color: #f9f9f9;
+.edit-row {
+    background-color: #dadada;
 }
 
-.editRow input {
-    width: 100px;
+.edit-row input {
+    margin: 0 8px;
 }
 
-.editRow input:nth-of-type(2) {
-    width: 180px;
-}
+/* .edit-row input { */
+/*     width: 100px; */
+/* } */
+
+/* .edit-row input:nth-of-type(2) { */
+/*     width: 180px; */
+/* } */
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
