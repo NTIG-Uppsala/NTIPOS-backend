@@ -44,7 +44,6 @@ categories.MapPut("/{id}", DatabaseHelper.UpdateCategory);
 
 categories.MapDelete("/{id}", DatabaseHelper.DeleteCategory);
 
-app.UsePathBase("/admin");
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.MapStaticAssets().ShortCircuit();
