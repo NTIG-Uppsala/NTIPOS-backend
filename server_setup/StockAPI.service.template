@@ -7,7 +7,7 @@ ExecStart=/srv/StockAPI/StockAPI
 SyslogIdentifier=StockAPI
 
 # Replace {USERNAME} with your username
-# User={USERNAME}
+User={USERNAME}
 
 Restart=always
 RestartSec=5
@@ -18,7 +18,7 @@ Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
 
 # Replace {IP ADDRESS} with the ip address of the server and {PORT} with the port the api should be served on.
 # * can be used instead of an ip address if you don't have a static ip address.
-# Environment=ASPNETCORE_URLS=http://{IP ADDRESS}:{PORT}
+Environment=ASPNETCORE_URLS=http://{IP ADDRESS}:{PORT}
 
 [Install]
 WantedBy=multi-user.target

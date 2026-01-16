@@ -21,7 +21,6 @@ addProductForm.onsubmit = function() {
 addCategoryForm.onsubmit = function() {
     var formData = new FormData(addCategoryForm)
     formData = Object.fromEntries(formData)
-    formData.color = formData.color.replace("#","")
     fetch("/api/v2/categories", {method: "POST", body: JSON.stringify(formData), headers: {"Content-Type": "application/json",}})
     window.location.reload()
 }
@@ -65,7 +64,7 @@ async function waitForData() {
 function insertCategoryProperties() {
     allProducts.forEach(product => {
         let category = allCategories.find(value => { return value.id == product.category})
-        category = category != null ? category : {name: "Ingen kategori", color: "ffffff"}
+        category = category != null ? category : {name: "Ingen kategori", color: "#ffffff"}
         product.categoryId = product.category
         product.category = category.name
         product.color = category.color
@@ -108,7 +107,7 @@ function populateProductTable() {
                     case 0: cellContent = product.id; break;
                     case 1: 
                         cellContent = document.createElement('DIV');
-                        cellContent.style.backgroundColor = `#${product.color}`
+                        cellContent.style.backgroundColor = product.color
                         cellContent.style.margin = "-8px"
                         cellContent.style.padding = "8px"
                         cellContent.textContent = product.category; break;
@@ -158,10 +157,10 @@ function populateCategoryTable() {
                     case 1: cellContent = category.name; break;
                     case 2: 
                         cellContent = document.createElement('DIV');
-                        cellContent.style.backgroundColor = `#${category.color}`
+                        cellContent.style.backgroundColor = category.color
                         cellContent.style.margin = "-8px"
                         cellContent.style.padding = "8px"
-                        cellContent.textContent = "#" + category.color; break;
+                        cellContent.textContent = category.color; break;
                     case 3:
                         cellContent = document.createElement('button')
                         cellContent.classList.add('editBtn')
@@ -307,7 +306,7 @@ function editCategory(category, categoryRow) {
     categoryColor.id = "edit-color"
     categoryColor.type = "color"
     categoryColor.name = "color"
-    categoryColor.value = "#" + category.color
+    categoryColor.value = category.color
     categoryColor.required = true
 
     editForm.appendChild(categoryColor)
@@ -321,7 +320,6 @@ function editCategory(category, categoryRow) {
     editForm.onsubmit = function() {
         var formData = new FormData(editForm)
         formData = Object.fromEntries(formData)
-        formData.color = formData.color.replace("#","")
         fetch(`/api/v2/categories/${category.id}`, {method: "PUT", body: JSON.stringify(formData), headers: {"Content-Type": "application/json",}})
         window.location.reload()
     }

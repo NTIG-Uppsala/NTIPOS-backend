@@ -200,7 +200,7 @@ POST
 ```json
 {
   "name": "Electronics",
-  "color": "1010fa"
+  "color": "#1010fa"
 }
 ```
 
@@ -209,6 +209,7 @@ POST
 {
   "id": ID,
   "name": "Electronics",
+  "color": "#1010fa"
   "createdAt": "2025-12-16T10:15:30Z",
   "updatedAt": "2025-12-16T10:15:30Z"
 }
@@ -225,7 +226,7 @@ GET
   {
     "id": ID,
     "name": "Electronics",
-    "color": "1010fa"
+    "color": "#1010fa"
   }
 ]
 ```
@@ -240,7 +241,7 @@ GET
 {
   "id": ID,
   "name": "Electronics",
-  "color": "1010fa"
+  "color": "#1010fa"
 }
 ```
 
@@ -253,7 +254,7 @@ PUT
 ```json
 {
   "name": "Gaming",
-  "color": "ff0000"
+  "color": "#ff0000"
 }
 ```
 
@@ -262,7 +263,7 @@ PUT
 {
   "id": ID,
   "name": "Gaming",
-  "color": "ff0000"
+  "color": "#ff0000"
 }
 ```
 

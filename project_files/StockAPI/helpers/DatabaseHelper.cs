@@ -81,10 +81,10 @@ namespace Helpers
         {
             var categories = new[]
             {
-                new Category{ name = "Tobak", color = "8b4513"},
-                new Category{ name = "Godis", color = "ffb6c1"},
-                new Category{ name = "Enkel mat", color = "ffa500"},
-                new Category{ name = "Tidningar", color = "add8e6"},
+                new Category{ name = "Tobak", color = "#8b4513"},
+                new Category{ name = "Godis", color = "#ffb6c1"},
+                new Category{ name = "Enkel mat", color = "#ffa500"},
+                new Category{ name = "Tidningar", color = "#add8e6"},
             };
 
                     foreach (var category in categories){AddCategory(category);}
@@ -404,7 +404,7 @@ namespace Helpers
 
             return result;
         }
-//
+
         public static object UpdateCategory(Category category, int id)
         {
             object result = new {};
