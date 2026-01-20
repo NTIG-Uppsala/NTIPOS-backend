@@ -35,6 +35,7 @@ If the application has unexpected behavior try to enter the following:
 
 ```
 rm -r /srv/StockAPI
+cd ~/NTIPOS-backend/project_files/StockAPI
 dotnet publish -c Release -o /srv/StockAPI/
 systemctl restart StockAPI.service
 ```
