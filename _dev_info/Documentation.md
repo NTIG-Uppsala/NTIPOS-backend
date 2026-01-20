@@ -31,5 +31,12 @@ systemctl restart StockAPI.service
 ```
 It will succeed with one warning. 
 
+If the application has unexpected behavior try to enter the following:
+
+```
+rm -r /srv/StockAPI
+dotnet publish -c Release -o /srv/StockAPI/
+systemctl restart StockAPI.service
+```
 ---
 [Go back to README](../README.md)
