@@ -3,6 +3,7 @@ A backend for [NTIPOS](https://github.com/NTIG-Uppsala/NTIPOS)
 
 ## Links to dev info for this repository
 * [Documentation (Backend)](_dev_info/Documentation.md)
+* [TODOS and known bugs](_dev_info/TODOSAndKnownBugs.md)
 
 ## API Documentation
 * ~~[Version 1](_dev_info/API_documentation/API_documentation_V1.md)~~ DEPRICATED!
